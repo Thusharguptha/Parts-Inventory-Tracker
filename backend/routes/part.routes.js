@@ -11,6 +11,12 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Check for duplicate part name (case-insensitive)
+    const existingPart = await Part.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+    if (existingPart) {
+      return res.status(409).json({ message: `Part "${name}" already exists` });
+    }
+
     const part = new Part({
       name,
       quantity,
