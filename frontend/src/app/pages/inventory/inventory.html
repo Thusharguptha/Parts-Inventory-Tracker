@@ -1,1 +1,240 @@
-<p>inventory works!</p>
+<!-- Alerts -->
+@if (successMsg()) {
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg() }}
+    <button type="button" class="btn-close" (click)="successMsg.set('')"></button>
+</div>
+}
+@if (errorMsg()) {
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMsg() }}
+    <button type="button" class="btn-close" (click)="errorMsg.set('')"></button>
+</div>
+}
+
+<!-- Loading Spinner -->
+@if (loading()) {
+<div class="loading-overlay">
+    <div class="text-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading inventory data...</p>
+    </div>
+</div>
+} @else {
+
+<!-- ===== Dashboard Cards ===== -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card dashboard-card text-white bg-primary shadow">
+            <div class="card-body d-flex align-items-center">
+                <i class="bi bi-boxes display-4 me-3 opacity-75"></i>
+                <div>
+                    <h6 class="card-title mb-1 opacity-75">Total Parts</h6>
+                    <h2 class="mb-0 fw-bold">{{ dashboard().totalParts }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card dashboard-card text-white bg-danger shadow">
+            <div class="card-body d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle display-4 me-3 opacity-75"></i>
+                <div>
+                    <h6 class="card-title mb-1 opacity-75">Low Stock Items</h6>
+                    <h2 class="mb-0 fw-bold">{{ dashboard().lowStockCount }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card dashboard-card text-white bg-success shadow">
+            <div class="card-body d-flex align-items-center">
+                <i class="bi bi-currency-rupee display-4 me-3 opacity-75"></i>
+                <div>
+                    <h6 class="card-title mb-1 opacity-75">Total Inventory Value</h6>
+                    <h2 class="mb-0 fw-bold">₹{{ dashboard().totalInventoryValue | number:'1.2-2' }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Parts Table ===== -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Parts Inventory</h5>
+        <span class="badge bg-light text-dark">{{ parts().length }} items</span>
+    </div>
+    <div class="card-body p-0">
+        @if (parts().length === 0) {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-1"></i>
+            <p class="mt-2">No parts found. Add your first part!</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Part Name</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Min Level</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (part of parts(); track part._id) {
+                    <tr [class.low-stock]="isLowStock(part)">
+                        <td class="fw-semibold">{{ part.name }}</td>
+                        <td class="text-center">{{ part.quantity }}</td>
+                        <td class="text-center">{{ part.minLevel }}</td>
+                        <td class="text-end">₹{{ part.unitPrice | number:'1.2-2' }}</td>
+                        <td class="text-center">
+                            @if (isLowStock(part)) {
+                            <span class="badge bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Low Stock</span>
+                            } @else {
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>In Stock</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-success btn-action me-1" (click)="openAddModal(part)">
+                                <i class="bi bi-plus-lg me-1"></i>Add
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger btn-action" (click)="openRemoveModal(part)">
+                                <i class="bi bi-dash-lg me-1"></i>Remove
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- ===== Stock Movement History ===== -->
+<div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Stock Movements</h5>
+    </div>
+    <div class="card-body p-0">
+        @if (history().length === 0) {
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-clock display-4"></i>
+            <p class="mt-2">No stock movements yet.</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Part Name</th>
+                        <th class="text-center">Action</th>
+                        <th class="text-center">Quantity</th>
+                        <th>Reason</th>
+                        <th>Date / Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (mov of history(); track mov._id) {
+                    <tr>
+                        <td class="fw-semibold">{{ mov.partName }}</td>
+                        <td class="text-center">
+                            @if (mov.action === 'Added') {
+                            <span class="badge bg-success">Added</span>
+                            } @else {
+                            <span class="badge bg-danger">Removed</span>
+                            }
+                        </td>
+                        <td class="text-center">{{ mov.quantity }}</td>
+                        <td>{{ mov.reason || '—' }}</td>
+                        <td>{{ mov.createdAt | date:'medium' }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
+}
+
+<!-- ===== Add Stock Modal ===== -->
+@if (showAddModal()) {
+<div class="modal-backdrop-custom" (click)="closeModals()"></div>
+<div class="custom-modal">
+    <div class="modal-content-custom">
+        <div class="modal-header bg-success text-white">
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Stock</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body p-4">
+            <p>Adding stock to: <strong>{{ selectedPart()?.name }}</strong></p>
+            <p class="text-muted mb-3">Current quantity: {{ selectedPart()?.quantity }}</p>
+            <div class="mb-3">
+                <label for="addQty" class="form-label fw-semibold">Quantity to Add</label>
+                <input type="number" id="addQty" class="form-control" [(ngModel)]="modalQuantity" min="1"
+                    placeholder="Enter quantity">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button class="btn btn-success" (click)="confirmAddStock()"
+                [disabled]="modalLoading() || modalQuantity <= 0">
+                @if (modalLoading()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>Adding...
+                } @else {
+                <i class="bi bi-check-lg me-1"></i>Confirm
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ===== Remove Stock Modal ===== -->
+@if (showRemoveModal()) {
+<div class="modal-backdrop-custom" (click)="closeModals()"></div>
+<div class="custom-modal">
+    <div class="modal-content-custom">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title"><i class="bi bi-dash-circle me-2"></i>Remove Stock</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body p-4">
+            <p>Removing stock from: <strong>{{ selectedPart()?.name }}</strong></p>
+            <p class="text-muted mb-3">Current quantity: {{ selectedPart()?.quantity }}</p>
+            <div class="mb-3">
+                <label for="removeQty" class="form-label fw-semibold">Quantity to Remove</label>
+                <input type="number" id="removeQty" class="form-control" [(ngModel)]="modalQuantity" min="1"
+                    [max]="selectedPart()?.quantity ?? 0" placeholder="Enter quantity">
+            </div>
+            <div class="mb-3">
+                <label for="reason" class="form-label fw-semibold">Reason</label>
+                <select id="reason" class="form-select" [(ngModel)]="modalReason">
+                    <option>Used in Service</option>
+                    <option>Damaged</option>
+                    <option>Sold</option>
+                    <option>Other</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button class="btn btn-danger" (click)="confirmRemoveStock()"
+                [disabled]="modalLoading() || modalQuantity <= 0">
+                @if (modalLoading()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>Removing...
+                } @else {
+                <i class="bi bi-check-lg me-1"></i>Confirm
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
