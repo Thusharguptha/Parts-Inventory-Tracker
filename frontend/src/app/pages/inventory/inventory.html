@@ -82,6 +82,7 @@
                         <th class="text-center">Quantity</th>
                         <th class="text-center">Min Level</th>
                         <th class="text-end">Unit Price</th>
+                        <th class="text-end">Quantity Value</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -93,6 +94,7 @@
                         <td class="text-center">{{ part.quantity }}</td>
                         <td class="text-center">{{ part.minLevel }}</td>
                         <td class="text-end">₹{{ part.unitPrice | number:'1.2-2' }}</td>
+                        <td class="text-end">₹{{ part.quantity * part.unitPrice | number:'1.2-2' }}</td>
                         <td class="text-center">
                             @if (isLowStock(part)) {
                             <span class="badge bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Low Stock</span>
