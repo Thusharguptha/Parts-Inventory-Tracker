@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const partRoutes = require("./routes/part.routes");
 const stockRoutes = require("./routes/stock.routes");
-
+const dashboardRoutes = require("./routes/dashboard.routes");
 
 const app = express();
 
@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/parts", partRoutes);
 app.use("/api/stock", stockRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
