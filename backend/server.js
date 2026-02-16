@@ -4,6 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const partRoutes = require("./routes/part.routes");
+const stockRoutes = require("./routes/stock.routes");
+
 
 const app = express();
 
@@ -15,6 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/parts", partRoutes);
+app.use("/api/stock", stockRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
