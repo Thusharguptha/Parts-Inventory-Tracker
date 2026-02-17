@@ -1,8 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PartService } from '../../services/part.service';
+
+// Custom validator for integer values
+function integerValidator(control: AbstractControl): ValidationErrors | null {
+  if (control.value === null || control.value === '') return null;
+  return Number.isInteger(control.value) ? null : { integer: true };
+}
 
 @Component({
   selector: 'app-add-part',
@@ -17,8 +23,8 @@ export class AddPart {
 
   partForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
-    minLevel: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0), integerValidator]),
+    minLevel: new FormControl<number | null>(null, [Validators.required, Validators.min(0), integerValidator]),
     unitPrice: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
   });
 

@@ -70,6 +70,13 @@ export class Inventory implements OnInit {
     const part = this.selectedPart();
     if (!part || this.modalQuantity <= 0) return;
 
+    // Validate integer input
+    if (!Number.isInteger(this.modalQuantity)) {
+      this.errorMsg.set('Quantity must be a Numerical number.');
+      this.clearMsgAfterDelay();
+      return;
+    }
+
     this.modalLoading.set(true);
     this.partService.addStock(part._id, this.modalQuantity).subscribe({
       next: () => {
@@ -98,6 +105,20 @@ export class Inventory implements OnInit {
   confirmRemoveStock() {
     const part = this.selectedPart();
     if (!part || this.modalQuantity <= 0) return;
+
+    // Validate integer input
+    if (!Number.isInteger(this.modalQuantity)) {
+      this.errorMsg.set('Quantity must be a whole number.');
+      this.clearMsgAfterDelay();
+      return;
+    }
+
+    // Validate that we're not removing more than available
+    if (this.modalQuantity > part.quantity) {
+      this.errorMsg.set(`Cannot remove ${this.modalQuantity} units. Only ${part.quantity} units available.`);
+      this.clearMsgAfterDelay();
+      return;
+    }
 
     this.modalLoading.set(true);
     this.partService.removeStock(part._id, this.modalQuantity, this.modalReason).subscribe({
