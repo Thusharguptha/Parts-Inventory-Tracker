@@ -31,6 +31,7 @@
                         <div class="invalid-feedback">
                             @if (partForm.get('name')!.errors?.['required']) { Part name is required. }
                             @if (partForm.get('name')!.errors?.['minlength']) { At least 2 characters. }
+                            @if (partForm.get('name')!.errors?.['maxlength']) { Cannot exceed 100 characters. }
                         </div>
                         }
                     </div>
@@ -44,7 +45,8 @@
                         @if (partForm.get('quantity')!.invalid && partForm.get('quantity')!.touched) {
                         <div class="invalid-feedback">
                             @if (partForm.get('quantity')!.errors?.['required']) { Quantity is required. }
-                            @if (partForm.get('quantity')!.errors?.['min']) { Cannot be negative. }
+                            @if (partForm.get('quantity')!.errors?.['min']) { Cannot be negative or zero. }
+                            @if (partForm.get('quantity')!.errors?.['max']) { Quantity cannot exceed 1,000,000. }
                             @if (partForm.get('quantity')!.errors?.['integer']) { Must be a Numerical number. }
                         </div>
                         }
@@ -59,7 +61,8 @@
                         @if (partForm.get('minLevel')!.invalid && partForm.get('minLevel')!.touched) {
                         <div class="invalid-feedback">
                             @if (partForm.get('minLevel')!.errors?.['required']) { Minimum level is required. }
-                            @if (partForm.get('minLevel')!.errors?.['min']) { Cannot be negative. }
+                            @if (partForm.get('minLevel')!.errors?.['min']) { Cannot be negative or zero. }
+                            @if (partForm.get('minLevel')!.errors?.['max']) { Cannot exceed 1,000,000. }
                             @if (partForm.get('minLevel')!.errors?.['integer']) { Must be a Numerical number. }
                         </div>
                         }
@@ -74,7 +77,8 @@
                         @if (partForm.get('unitPrice')!.invalid && partForm.get('unitPrice')!.touched) {
                         <div class="invalid-feedback">
                             @if (partForm.get('unitPrice')!.errors?.['required']) { Unit price is required. }
-                            @if (partForm.get('unitPrice')!.errors?.['min']) { Cannot be negative. }
+                            @if (partForm.get('unitPrice')!.errors?.['min']) { Price must be greater than zero. }
+                            @if (partForm.get('unitPrice')!.errors?.['max']) { Price cannot exceed ₹1,00,000. }
                         </div>
                         }
                     </div>

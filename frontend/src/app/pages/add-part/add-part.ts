@@ -22,10 +22,10 @@ export class AddPart {
   errorMsg = signal('');
 
   partForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0), integerValidator]),
-    minLevel: new FormControl<number | null>(null, [Validators.required, Validators.min(0), integerValidator]),
-    unitPrice: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    name: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0), Validators.max(1000000), integerValidator]),
+    minLevel: new FormControl<number | null>(null, [Validators.required, Validators.min(1), Validators.max(1000000), integerValidator]),
+    unitPrice: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01), Validators.max(100000)]),
   });
 
   constructor(private partService: PartService, private router: Router) { }
