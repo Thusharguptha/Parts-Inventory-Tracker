@@ -149,8 +149,10 @@
                         <td class="text-center">
                             @if (mov.action === 'Added') {
                             <span class="badge bg-success">Added</span>
-                            } @else {
+                            } @else if (mov.action === 'Removed') {
                             <span class="badge bg-danger">Removed</span>
+                            } @else{
+                            <span class="badge bg-success">New Part Added</span>
                             }
                         </td>
                         <td class="text-center">{{ mov.quantity }}</td>

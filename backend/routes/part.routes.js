@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Part = require("../models/Part");
+const StockMovement = require("../models/StockMovement");
+
 
 // ✅ Create a new part
 router.post("/", async (req, res) => {
@@ -24,8 +26,17 @@ router.post("/", async (req, res) => {
       unitPrice,
     });
 
+    const add_stock = new StockMovement({
+      partId: part._id,
+      partName: part.name,
+      quantity: quantity,
+      action: "New Part Added",
+      reason: "Initial stock added"
+    })
+
     const savedPart = await part.save();
-    res.status(201).json(savedPart);
+    const savedStock = await add_stock.save();
+    res.status(201).json({ message: "Part created successfully", savedPart, savedStock });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to create part" });
