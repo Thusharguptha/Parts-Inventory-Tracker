@@ -47,9 +47,12 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const parts = await Part.find().sort({ createdAt: -1 });
-    res.json(parts);
+    const lowStock = parts.filter(
+      (part) => part.quantity < part.minLevel
+    )
+    res.json({parts, lowStock});
   } catch (error) {
-    console.error(error);
+    console.error(error);   
     res.status(500).json({ message: "Failed to fetch parts" });
   }
 });

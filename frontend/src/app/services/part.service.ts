@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment.development';
 
 export interface Part {
     _id: string;
@@ -37,7 +38,8 @@ export class PartService {
     constructor(private http: HttpClient) { }
 
     getParts(): Observable<Part[]> {
-        return this.http.get<Part[]>(`${this.baseUrl}/parts`);
+        return this.http.get<{ parts: Part[], lowStock: Part[] }>(`${this.baseUrl}/parts`)
+            .pipe(map(res => res.parts));
     }
 
     addPart(part: { name: string; quantity: number; minLevel: number; unitPrice: number }): Observable<Part> {
@@ -54,6 +56,10 @@ export class PartService {
 
     getDashboard(): Observable<DashboardSummary> {
         return this.http.get<DashboardSummary>(`${this.baseUrl}/dashboard`);
+    }
+
+    getLowStock(): Observable<Part[]> {
+        return this.http.get<Part[]>(`${this.baseUrl}/low-stock`);
     }
 
     getHistory(): Observable<StockMovement[]> {

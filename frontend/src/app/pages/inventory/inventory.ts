@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PartService, Part, DashboardSummary, StockMovement } from '../../services/part.service';
@@ -16,6 +16,14 @@ export class Inventory implements OnInit {
   loading = signal(true);
   successMsg = signal('');
   errorMsg = signal('');
+  filterLowStock = signal(false);
+
+  filteredParts = computed(() => {
+    if (this.filterLowStock()) {
+      return this.parts().filter(p => p.quantity < p.minLevel);
+    }
+    return this.parts();
+  });
 
   // Modal state
   showAddModal = signal(false);
@@ -57,6 +65,10 @@ export class Inventory implements OnInit {
 
   isLowStock(part: Part): boolean {
     return part.quantity < part.minLevel;
+  }
+
+  toggleLowStockFilter() {
+    this.filterLowStock.set(!this.filterLowStock());
   }
 
   // --- Add Stock Modal ---

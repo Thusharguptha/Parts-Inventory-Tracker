@@ -37,14 +37,18 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card dashboard-card text-white bg-danger shadow">
+    <div class="col-md-4" (click)="toggleLowStockFilter()" style="cursor: pointer;">
+        <div class="card dashboard-card text-white shadow" [class.bg-danger]="!filterLowStock()"
+            [class.bg-warning]="filterLowStock()">
             <div class="card-body d-flex align-items-center">
                 <i class="bi bi-exclamation-triangle display-4 me-3 opacity-75"></i>
                 <div>
                     <h6 class="card-title mb-1 opacity-75">Low Stock Items</h6>
                     <h2 class="mb-0 fw-bold">{{ dashboard().lowStockCount }}</h2>
                 </div>
+                @if (filterLowStock()) {
+                <i class="bi bi-funnel-fill ms-auto fs-4"></i>
+                }
             </div>
         </div>
     </div>
@@ -65,13 +69,23 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="bi bi-table me-2"></i>Parts Inventory</h5>
-        <span class="badge bg-light text-dark">{{ parts().length }} items</span>
+        <div>
+            @if (filterLowStock()) {
+            <span class="badge bg-warning text-dark me-2"><i class="bi bi-funnel-fill me-1"></i>Low Stock Filter</span>
+            }
+            <span class="badge bg-light text-dark">{{ filteredParts().length }} items</span>
+        </div>
     </div>
     <div class="card-body p-0">
-        @if (parts().length === 0) {
+        @if (filteredParts().length === 0) {
         <div class="text-center py-5 text-muted">
             <i class="bi bi-inbox display-1"></i>
+            @if (filterLowStock()) {
+            <p class="mt-2">No low stock items found.</p>
+            <button class="btn btn-outline-secondary btn-sm" (click)="toggleLowStockFilter()">Show All Parts</button>
+            } @else {
             <p class="mt-2">No parts found. Add your first part!</p>
+            }
         </div>
         } @else {
         <div class="table-responsive">
@@ -88,7 +102,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (part of parts(); track part._id) {
+                    @for (part of filteredParts(); track part._id) {
                     <tr [class.low-stock]="isLowStock(part)">
                         <td class="fw-semibold">{{ part.name }}</td>
                         <td class="text-center">{{ part.quantity }}</td>
